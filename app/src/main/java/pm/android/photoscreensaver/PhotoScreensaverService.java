@@ -1,6 +1,5 @@
 package pm.android.photoscreensaver;
 
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.dreams.DreamService;
@@ -50,6 +49,11 @@ public class PhotoScreensaverService extends DreamService {
      * The image view which displays the current photo on the screen.
      */
     private ImageView imageView;
+
+    /**
+     * URL of the photo currently loaded into the imageView.
+     */
+    private String photoUrl;
 
     /**
      * A handler associated with the main thread that we use to schedule the switching of the photos.
@@ -105,18 +109,21 @@ public class PhotoScreensaverService extends DreamService {
             return; // screensaver was stopped
         }
 
-        // keep the current photo as a placeholder until the new one is being loaded
-        Drawable currentPhoto = imageView.getDrawable();
+        // keep the old photo until the new one is being loaded
+        String oldPhotoUrl = photoUrl;
 
-        String nextPhotoUrl = getRandomPhotoUrl();
-        Log.d(TAG, "loading photo " + nextPhotoUrl);
+        photoUrl = getRandomPhotoUrl();
+        Log.d(TAG, "loading photo " + photoUrl);
 
         Glide.with(this)
-                .load(nextPhotoUrl)
-                .skipMemoryCache(true)
+                .load(photoUrl)
+                .thumbnail(Glide.with(this)
+                    .load(oldPhotoUrl)
+                    .fitCenter()
+                )
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .placeholder(currentPhoto)
                 .dontAnimate()
+                .fitCenter()
                 .into(imageView);
 
         mainThreadHandler.postDelayed(new Runnable() {
