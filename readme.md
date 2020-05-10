@@ -2,4 +2,4 @@ Basic Android TV application that displays a screensaver with photos. The photos
 
 ---------------------------
 
-Original implementation was taken from this example - https://github.com/klinker41/android-dreamscene.
+Idea for the original implementation was taken from this example - https://github.com/klinker41/android-dreamscene.
