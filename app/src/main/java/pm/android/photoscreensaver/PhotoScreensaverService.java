@@ -1,5 +1,6 @@
 package pm.android.photoscreensaver;
 
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.dreams.DreamService;
@@ -8,7 +9,12 @@ import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +38,11 @@ public class PhotoScreensaverService extends DreamService {
      * Time interval in seconds before switching to the next photo.
      */
     private static final int SWITCH_INTERVAL = 15;
+
+    /**
+     * Request timeout in milliseconds.
+     */
+    private static final int REQUEST_TIMEOUT = 10000;
 
     /**
      * Volley is the library that handles the HTTP request to load the photos list.
@@ -64,6 +75,21 @@ public class PhotoScreensaverService extends DreamService {
      * A flag that we use to stop switching photos when the screensaver is stopped.
      */
     private boolean running = false;
+
+    /**
+     * Glide request error listener.
+     */
+    private final RequestListener<Drawable> errorListener = new RequestListener<Drawable>() {
+        @Override
+        public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+            Log.e(TAG, "failed to load " + model, e);
+            return false;
+        }
+        @Override
+        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+            return false;
+        }
+    };
 
     @Override
     public void onAttachedToWindow() {
@@ -115,15 +141,21 @@ public class PhotoScreensaverService extends DreamService {
         photoUrl = getRandomPhotoUrl();
         Log.d(TAG, "loading photo " + photoUrl);
 
+        RequestOptions options = new RequestOptions()
+                .timeout(REQUEST_TIMEOUT)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .fitCenter();
+
+
+
         Glide.with(this)
                 .load(photoUrl)
+                .apply(options)
                 .thumbnail(Glide.with(this)
                     .load(oldPhotoUrl)
-                    .fitCenter()
+                    .apply(options)
                 )
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .dontAnimate()
-                .fitCenter()
+                .listener(errorListener)
                 .into(imageView);
 
         mainThreadHandler.postDelayed(new Runnable() {
