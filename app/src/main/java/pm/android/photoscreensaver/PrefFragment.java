@@ -2,13 +2,12 @@ package pm.android.photoscreensaver;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.leanback.preference.LeanbackPreferenceFragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceManager;
-import androidx.preference.PreferenceScreen;
 
 public class PrefFragment
         extends LeanbackPreferenceFragment
@@ -36,11 +35,7 @@ public class PrefFragment
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        Preference hostPref = getPreferenceScreen().findPreference("pref_key_server_host");
-        Preference portPref = getPreferenceScreen().findPreference("pref_key_server_port");
-
-        updateSummary((EditTextPreference)hostPref);
-        updateSummary((EditTextPreference)portPref);
+        updateEditTextPrefSummary(getPreferenceScreen());
     }
 
     @Override
@@ -54,11 +49,22 @@ public class PrefFragment
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference changedPreference = getPreferenceScreen().findPreference(key);
         if (changedPreference instanceof EditTextPreference) {
-            updateSummary((EditTextPreference)changedPreference);
+            updateEditTextPrefSummary((EditTextPreference)changedPreference);
         }
     }
 
-    private void updateSummary(EditTextPreference preference) {
+    private void updateEditTextPrefSummary(PreferenceGroup preferenceGroup) {
+        for (int i = 0; i < preferenceGroup.getPreferenceCount(); i++) {
+            Preference preference = preferenceGroup.getPreference(i);
+            if (preference instanceof PreferenceGroup) {
+                updateEditTextPrefSummary((PreferenceGroup)preference);
+            } else if (preference instanceof EditTextPreference) {
+                updateEditTextPrefSummary((EditTextPreference)preference);
+            }
+        }
+    }
+
+    private void updateEditTextPrefSummary(EditTextPreference preference) {
         preference.setSummary(preference.getText());
     }
 }
