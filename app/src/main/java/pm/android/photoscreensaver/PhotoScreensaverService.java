@@ -32,10 +32,10 @@ public class PhotoScreensaverService extends DreamService {
     private static final String TAG = PhotoScreensaverService.class.getName();
 
     /**
-     * URL of the server from where the screensaver photos are loaded.
+     * URL path from where the screensaver photos are loaded from the server.
      * The server returns a JSON array with a list of URLs of all photos.
      */
-    private static final String PHOTOS_URL = "http://192.168.1.5:9090/photos/list";
+    private static final String PHOTOS_URL_PATH = "/photos/list";
 
     /**
      * Time interval in seconds before switching to the next photo.
@@ -94,6 +94,18 @@ public class PhotoScreensaverService extends DreamService {
         }
     };
 
+    private String getPhotosUrl() {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String host = prefs.getString("pref_key_server_host", null);
+        String port = prefs.getString("pref_key_server_port", null);
+
+        if (host == null || port == null)
+            return null;
+
+        return "http://" + host + ":" + port + PHOTOS_URL_PATH;
+    }
+
     @Override
     public void onAttachedToWindow() {
         setInteractive(false);
@@ -130,7 +142,7 @@ public class PhotoScreensaverService extends DreamService {
     }
 
     private void loadPhotosList(final Runnable callback) {
-        volley.getJSONArray(PHOTOS_URL, new Response.Listener<JSONArray>() {
+        volley.getJSONArray(getPhotosUrl(), new Response.Listener<JSONArray>() {
             public void onResponse(JSONArray response) {
                 photos = jsonArrayToList(response);
                 Log.d(TAG, "loaded photos: " + photos);

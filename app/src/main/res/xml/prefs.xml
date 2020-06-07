@@ -9,16 +9,12 @@
 
         <EditTextPreference
             android:key="pref_key_server_host"
-            android:title="Host"
-            android:summary="192.168.1.5"
-            android:defaultValue="192.168.1.5">
+            android:title="Host">
         </EditTextPreference>
 
         <EditTextPreference
             android:key="pref_key_server_port"
-            android:title="Port"
-            android:summary="9090"
-            android:defaultValue="9090">
+            android:title="Port">
         </EditTextPreference>
 
     </PreferenceCategory>
