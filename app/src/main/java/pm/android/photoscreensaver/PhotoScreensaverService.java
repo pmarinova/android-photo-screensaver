@@ -1,11 +1,14 @@
 package pm.android.photoscreensaver;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.dreams.DreamService;
 import android.util.Log;
 import android.widget.ImageView;
+
+import androidx.preference.PreferenceManager;
 
 import com.android.volley.Response;
 import com.bumptech.glide.Glide;
@@ -102,6 +105,13 @@ public class PhotoScreensaverService extends DreamService {
         volley = new VolleyHelper(this);
         imageView = findViewById(R.id.imageView);
         mainThreadHandler = new Handler(Looper.getMainLooper());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String host = prefs.getString("pref_key_server_host", null);
+        String port = prefs.getString("pref_key_server_port", null);
+
+        Log.d(TAG, "host: " + host);
+        Log.d(TAG, "port: " + port);
     }
 
     @Override
