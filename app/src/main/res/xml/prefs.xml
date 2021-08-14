@@ -9,12 +9,14 @@
 
         <EditTextPreference
             android:key="pref_key_server_host"
-            android:title="Host">
+            android:title="Host"
+            android:inputType="textUri">
         </EditTextPreference>
 
         <EditTextPreference
             android:key="pref_key_server_port"
-            android:title="Port">
+            android:title="Port"
+            android:inputType="numberDecimal">
         </EditTextPreference>
 
     </PreferenceCategory>

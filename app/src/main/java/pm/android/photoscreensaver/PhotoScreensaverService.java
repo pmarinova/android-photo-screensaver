@@ -32,10 +32,17 @@ public class PhotoScreensaverService extends DreamService {
     private static final String TAG = PhotoScreensaverService.class.getName();
 
     /**
-     * URL path from where the screensaver photos are loaded from the server.
-     * The server returns a JSON array with a list of URLs of all photos.
+     * Base URL path from where the screensaver photos are loaded.
      */
-    private static final String PHOTOS_URL_PATH = "/photos/list";
+    private static final String PHOTOS_BASE_URL_PATH = "/photos";
+
+    /**
+     * URL path from where the list of photos is loaded.
+     * The server returns a JSON array with a list of all photos.
+     */
+    private static final String PHOTOS_LIST_URL_PATH = PHOTOS_BASE_URL_PATH + "/list";
+
+
 
     /**
      * Time interval in seconds before switching to the next photo.
@@ -55,7 +62,7 @@ public class PhotoScreensaverService extends DreamService {
 
     /**
      * The list of photos provided by the server.
-     * Each entry is a URL of a single photo.
+     * Each entry contains the relative path of the photo.
      */
     private List<String> photos;
 
@@ -94,16 +101,21 @@ public class PhotoScreensaverService extends DreamService {
         }
     };
 
-    private String getPhotosUrl() {
-
+    private String getServerUrl() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String host = prefs.getString("pref_key_server_host", null);
         String port = prefs.getString("pref_key_server_port", null);
+        return "http://" + host + ":" + port;
+    }
 
-        if (host == null || port == null)
-            return null;
+    private String getPhotosListUrl() {
+        String serverUrl = getServerUrl();
+        return serverUrl + PHOTOS_LIST_URL_PATH;
+    }
 
-        return "http://" + host + ":" + port + PHOTOS_URL_PATH;
+    private String getPhotoUrl(String photo) {
+        String serverUrl = getServerUrl();
+        return serverUrl + PHOTOS_BASE_URL_PATH + "/" + photo;
     }
 
     @Override
@@ -142,7 +154,7 @@ public class PhotoScreensaverService extends DreamService {
     }
 
     private void loadPhotosList(final Runnable callback) {
-        volley.getJSONArray(getPhotosUrl(), new Response.Listener<JSONArray>() {
+        volley.getJSONArray(getPhotosListUrl(), new Response.Listener<JSONArray>() {
             public void onResponse(JSONArray response) {
                 photos = jsonArrayToList(response);
                 Log.d(TAG, "loaded photos: " + photos);
@@ -187,7 +199,8 @@ public class PhotoScreensaverService extends DreamService {
 
     private String getRandomPhotoUrl() {
         int randomIndex = new Random().nextInt(photos.size());
-        return photos.get(randomIndex);
+        String photo = photos.get(randomIndex);
+        return getPhotoUrl(photo);
     }
 
     private static List<String> jsonArrayToList(JSONArray jsonArray) {
