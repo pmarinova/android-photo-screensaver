@@ -3,7 +3,6 @@
     <string name="app_name">Photo Screensaver</string>
     <string name="screensaver_name">Photos</string>
 
-    <string name="prefs_title">Photos</string>
     <string name="prefs_server_settings_title">Server settings</string>
     <string name="prefs_server_host">Host</string>
     <string name="prefs_server_port">Port</string>
