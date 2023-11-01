@@ -4,8 +4,10 @@
     android:title="@string/screensaver_name">
 
     <SwitchPreference
-        android:key="pref_key_discover_automatically"
-        android:title="@string/pref_title_discover_automatically">
+        android:key="@string/pref_key_discover_automatically"
+        android:title="@string/pref_title_discover_automatically"
+        android:defaultValue="true"
+        android:disableDependentsState="true">
     </SwitchPreference>
 
     <PreferenceCategory
@@ -15,7 +17,8 @@
 
     <PreferenceCategory
         android:key="@string/pref_key_server_settings"
-        android:title="@string/pref_title_server_settings">
+        android:title="@string/pref_title_server_settings"
+        android:dependency="@string/pref_key_discover_automatically">
 
         <EditTextPreference
             android:key="@string/pref_key_server_host"
