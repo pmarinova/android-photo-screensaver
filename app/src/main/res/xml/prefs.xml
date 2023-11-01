@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="Photos">
+    android:title="@string/prefs_title">
 
     <PreferenceCategory
         android:key="pref_key_server"
-        android:title="Server settings">
+        android:title="@string/prefs_server_settings_title">
 
         <EditTextPreference
             android:key="pref_key_server_host"
-            android:title="Host"
+            android:title="@string/prefs_server_host"
             android:inputType="textUri">
         </EditTextPreference>
 
         <EditTextPreference
             android:key="pref_key_server_port"
-            android:title="Port"
+            android:title="@string/prefs_server_port"
             android:inputType="numberDecimal">
         </EditTextPreference>
 
