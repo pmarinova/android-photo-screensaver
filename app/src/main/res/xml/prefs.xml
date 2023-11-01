@@ -3,19 +3,29 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/screensaver_name">
 
+    <SwitchPreference
+        android:key="pref_key_discover_automatically"
+        android:title="@string/pref_title_discover_automatically">
+    </SwitchPreference>
+
     <PreferenceCategory
-        android:key="pref_key_server"
-        android:title="@string/prefs_server_settings_title">
+        android:key="@string/pref_key_available_servers"
+        android:title="@string/pref_title_available_servers">
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/pref_key_server_settings"
+        android:title="@string/pref_title_server_settings">
 
         <EditTextPreference
-            android:key="pref_key_server_host"
-            android:title="@string/prefs_server_host"
+            android:key="@string/pref_key_server_host"
+            android:title="@string/pref_title_server_host"
             android:inputType="textUri">
         </EditTextPreference>
 
         <EditTextPreference
-            android:key="pref_key_server_port"
-            android:title="@string/prefs_server_port"
+            android:key="@string/pref_key_server_port"
+            android:title="@string/pref_title_server_port"
             android:inputType="numberDecimal">
         </EditTextPreference>
 

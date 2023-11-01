@@ -3,8 +3,19 @@
     <string name="app_name">Photo Screensaver</string>
     <string name="screensaver_name">Photos</string>
 
-    <string name="prefs_server_settings_title">Server settings</string>
-    <string name="prefs_server_host">Host</string>
-    <string name="prefs_server_port">Port</string>
+    <string name="pref_key_discover_automatically">prefs_discover_automatically</string>
+    <string name="pref_title_discover_automatically">Discover available servers</string>
+
+    <string name="pref_key_available_servers">prefs_available_servers</string>
+    <string name="pref_title_available_servers">Available servers</string>
+
+    <string name="pref_key_server_settings">prefs_server_settings</string>
+    <string name="pref_title_server_settings">Server settings</string>
+
+    <string name="pref_key_server_host">prefs_server_host</string>
+    <string name="pref_title_server_host">Host</string>
+
+    <string name="pref_key_server_port">prefs_server_port</string>
+    <string name="pref_title_server_port">Port</string>
 
 </resources>

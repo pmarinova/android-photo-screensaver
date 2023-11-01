@@ -103,8 +103,8 @@ public class PhotoScreensaverService extends DreamService {
 
     private String getServerUrl() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String host = prefs.getString("pref_key_server_host", null);
-        String port = prefs.getString("pref_key_server_port", null);
+        String host = prefs.getString(getString(R.string.pref_key_server_host), null);
+        String port = prefs.getString(getString(R.string.pref_key_server_port), null);
         return "http://" + host + ":" + port;
     }
 
@@ -131,8 +131,8 @@ public class PhotoScreensaverService extends DreamService {
         mainThreadHandler = new Handler(Looper.getMainLooper());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String host = prefs.getString("pref_key_server_host", null);
-        String port = prefs.getString("pref_key_server_port", null);
+        String host = prefs.getString(getString(R.string.pref_key_server_host), null);
+        String port = prefs.getString(getString(R.string.pref_key_server_port), null);
 
         Log.d(TAG, "host: " + host);
         Log.d(TAG, "port: " + port);
