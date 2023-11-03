@@ -1,11 +1,7 @@
 package pm.android.photoscreensaver;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.leanback.preference.LeanbackPreferenceFragment;
 import androidx.preference.EditTextPreference;
@@ -13,6 +9,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
 
 import java.net.InetAddress;
 
@@ -21,6 +18,12 @@ public class PrefFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener, PhotoServiceDiscovery.Callback {
 
     private static final String TAG = PrefFragment.class.getName();
+
+    private SwitchPreference autoDiscover;
+    private PreferenceCategory availableServers;
+    private PreferenceCategory serverSettings;
+    private EditTextPreference serverHost;
+    private EditTextPreference serverPort;
 
     private SharedPreferences prefs;
     private PhotoServiceDiscovery serviceDiscovery;
@@ -35,23 +38,38 @@ public class PrefFragment
             setPreferencesFromResource(prefResId, root);
         }
 
+        autoDiscover = (SwitchPreference)findPreference(R.string.pref_key_discover_automatically);
+        availableServers = (PreferenceCategory)findPreference(R.string.pref_key_available_servers);
+        serverSettings = (PreferenceCategory)findPreference(R.string.pref_key_server_settings);
+        serverHost = (EditTextPreference)findPreference(R.string.pref_key_server_host);
+        serverPort = (EditTextPreference)findPreference(R.string.pref_key_server_port);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         serviceDiscovery = new PhotoServiceDiscovery(getPreferenceScreen().getContext(), this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        updateEditTextPrefSummary(serverSettings);
+
+        if (autoDiscover.isChecked()) {
+            serviceDiscovery.start();
+        }
+
         prefs.registerOnSharedPreferenceChangeListener(this);
-        updateEditTextPrefSummary(getPreferenceScreen());
-        serviceDiscovery.start();
     }
 
     @Override
     public void onPause() {
-        serviceDiscovery.stop();
         prefs.unregisterOnSharedPreferenceChangeListener(this);
-        prefs = null;
+
+        if (autoDiscover.isChecked()) {
+            serviceDiscovery.stop();
+            availableServers.removeAll();
+        }
+
         super.onPause();
     }
 
@@ -61,32 +79,32 @@ public class PrefFragment
         serverPref.setKey(serviceInstanceName);
         serverPref.setTitle(serviceInstanceName);
         serverPref.setSummary(host + ":" + port);
-
-        PreferenceCategory availableServers = findPreferenceCategory(R.string.pref_key_available_servers);
-        if (availableServers.findPreference(serverPref.getKey()) == null) {
-            availableServers.addPreference(serverPref);
-        }
+        availableServers.addPreference(serverPref);
     }
 
     @Override
     public void onServiceLost(String serviceInstanceName) {
-        PreferenceCategory availableServers = findPreferenceCategory(R.string.pref_key_available_servers);
         Preference serverPref = availableServers.findPreference(serviceInstanceName);
-        if (serverPref != null) {
-            availableServers.removePreference(serverPref);
-        }
-    }
-
-    private PreferenceCategory findPreferenceCategory(int keyResId) {
-        return (PreferenceCategory)findPreference(getString(keyResId));
+        availableServers.removePreference(serverPref);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference changedPreference = getPreferenceScreen().findPreference(key);
-        if (changedPreference instanceof EditTextPreference) {
+        if (changedPreference.equals(serverHost) || changedPreference.equals(serverPort)) {
             updateEditTextPrefSummary((EditTextPreference)changedPreference);
+        } else if (changedPreference.equals(autoDiscover)) {
+            if (autoDiscover.isChecked()) {
+                serviceDiscovery.start();
+            } else {
+                serviceDiscovery.stop();
+                availableServers.removeAll();
+            }
         }
+    }
+
+    private Preference findPreference(int keyResId) {
+        return findPreference(getString(keyResId));
     }
 
     private void updateEditTextPrefSummary(PreferenceGroup preferenceGroup) {
