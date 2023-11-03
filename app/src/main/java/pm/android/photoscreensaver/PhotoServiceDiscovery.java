@@ -14,8 +14,7 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     private static final String TAG = PhotoServiceDiscovery.class.getName();
 
-    private static final String SERVICE_TYPE = "_http._tcp";
-    private static final String SERVICE_NAME = "photo-server";
+    private static final String SERVICE_TYPE = "_photo-server._tcp";
 
     private final NsdManager nsdManager;
     private final Callback callback;
@@ -55,18 +54,16 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     @Override
     public void onServiceFound(NsdServiceInfo serviceInfo) {
-        if (serviceInfo.getServiceName().equals(SERVICE_NAME)) {
-            nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
-                @Override
-                public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                    callback.onServiceFound(serviceInfo);
-                }
-                @Override
-                public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-                    Log.d(TAG, "service resolve failed with error code " + errorCode);
-                }
-            });
-        }
+        nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
+            @Override
+            public void onServiceResolved(NsdServiceInfo serviceInfo) {
+                callback.onServiceFound(serviceInfo);
+            }
+            @Override
+            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.d(TAG, "service resolve failed with error code " + errorCode);
+            }
+        });
     }
 
     @Override
