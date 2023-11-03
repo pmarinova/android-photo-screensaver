@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.leanback.preference.LeanbackPreferenceFragment;
 import androidx.preference.EditTextPreference;
@@ -12,6 +13,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceManager;
+
+import java.net.InetAddress;
 
 public class PrefFragment
         extends LeanbackPreferenceFragment
@@ -53,18 +56,25 @@ public class PrefFragment
     }
 
     @Override
-    public void onServiceFound(NsdServiceInfo serviceInfo) {
-        Preference pref = new Preference(this.getPreferenceScreen().getContext());
-        pref.setTitle(serviceInfo.getServiceName());
-        pref.setSummary(serviceInfo.getHost().toString() + ":" + serviceInfo.getPort());
+    public void onServiceFound(String serviceInstanceName, InetAddress host, int port) {
+        Preference serverPref = new Preference(this.getPreferenceScreen().getContext());
+        serverPref.setKey(serviceInstanceName);
+        serverPref.setTitle(serviceInstanceName);
+        serverPref.setSummary(host + ":" + port);
 
         PreferenceCategory availableServers = findPreferenceCategory(R.string.pref_key_available_servers);
-        availableServers.addPreference(pref);
+        if (availableServers.findPreference(serverPref.getKey()) == null) {
+            availableServers.addPreference(serverPref);
+        }
     }
 
     @Override
-    public void onServiceLost(NsdServiceInfo serviceInfo) {
-        //TODO
+    public void onServiceLost(String serviceInstanceName) {
+        PreferenceCategory availableServers = findPreferenceCategory(R.string.pref_key_available_servers);
+        Preference serverPref = availableServers.findPreference(serviceInstanceName);
+        if (serverPref != null) {
+            availableServers.removePreference(serverPref);
+        }
     }
 
     private PreferenceCategory findPreferenceCategory(int keyResId) {

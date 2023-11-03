@@ -5,11 +5,13 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
+import java.net.InetAddress;
+
 public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     public interface Callback {
-        void onServiceFound(NsdServiceInfo serviceInfo);
-        void onServiceLost(NsdServiceInfo serviceInfo);
+        void onServiceFound(String serviceInstanceName, InetAddress host, int port);
+        void onServiceLost(String serviceInstanceName);
     }
 
     private static final String TAG = PhotoServiceDiscovery.class.getName();
@@ -54,10 +56,13 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     @Override
     public void onServiceFound(NsdServiceInfo serviceInfo) {
+        Log.d(TAG, "service found: " + serviceInfo.getServiceName());
         nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
             @Override
             public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                callback.onServiceFound(serviceInfo);
+                Log.d(TAG, "service resolved: " + serviceInfo);
+                callback.onServiceFound(serviceInfo.getServiceName(),
+                        serviceInfo.getHost(), serviceInfo.getPort());
             }
             @Override
             public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -68,6 +73,7 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     @Override
     public void onServiceLost(NsdServiceInfo serviceInfo) {
-        callback.onServiceLost(serviceInfo);
+        Log.d(TAG, "service lost: " + serviceInfo.getServiceName());
+        callback.onServiceLost(serviceInfo.getServiceName());
     }
 }
