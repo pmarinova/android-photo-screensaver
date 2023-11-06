@@ -1,6 +1,7 @@
 package pm.android.photoscreensaver;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 
 import androidx.leanback.preference.LeanbackPreferenceFragment;
@@ -74,11 +75,21 @@ public class PrefFragment
     }
 
     @Override
-    public void onServiceFound(String serviceInstanceName, InetAddress host, int port) {
+    public void onServiceFound(String serviceInstanceName, final InetAddress host, final int port) {
         Preference serverPref = new Preference(this.getPreferenceScreen().getContext());
         serverPref.setKey(serviceInstanceName);
         serverPref.setTitle(serviceInstanceName);
         serverPref.setSummary(host + ":" + port);
+
+        serverPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                serverHost.setText(host.getHostAddress());
+                serverPort.setText(Integer.toString(port));
+                return true;
+            }
+        });
+
         availableServers.addPreference(serverPref);
     }
 
