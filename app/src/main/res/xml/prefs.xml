@@ -19,19 +19,21 @@
         android:key="@string/pref_key_server_settings"
         android:title="@string/pref_title_server_settings"
         android:dependency="@string/pref_key_discover_automatically">
-
         <EditTextPreference
             android:key="@string/pref_key_server_host"
             android:title="@string/pref_title_server_host"
             android:inputType="textUri">
         </EditTextPreference>
-
         <EditTextPreference
             android:key="@string/pref_key_server_port"
             android:title="@string/pref_title_server_port"
             android:inputType="numberDecimal">
         </EditTextPreference>
-
     </PreferenceCategory>
+
+    <Preference
+        android:key="@string/pref_key_start"
+        android:title="@string/pref_title_start">
+    </Preference>
 
 </PreferenceScreen>

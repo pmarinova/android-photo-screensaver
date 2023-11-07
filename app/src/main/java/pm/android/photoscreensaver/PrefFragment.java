@@ -1,7 +1,7 @@
 package pm.android.photoscreensaver;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 
 import androidx.leanback.preference.LeanbackPreferenceFragment;
@@ -25,6 +25,7 @@ public class PrefFragment
     private PreferenceCategory serverSettings;
     private EditTextPreference serverHost;
     private EditTextPreference serverPort;
+    private Preference startNow;
 
     private SharedPreferences prefs;
     private PhotoServiceDiscovery serviceDiscovery;
@@ -44,9 +45,18 @@ public class PrefFragment
         serverSettings = (PreferenceCategory)findPreference(R.string.pref_key_server_settings);
         serverHost = (EditTextPreference)findPreference(R.string.pref_key_server_host);
         serverPort = (EditTextPreference)findPreference(R.string.pref_key_server_port);
+        startNow = findPreference(R.string.pref_key_start);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         serviceDiscovery = new PhotoServiceDiscovery(getPreferenceScreen().getContext(), this);
+
+        startNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                startScreensaver();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -131,5 +141,12 @@ public class PrefFragment
 
     private void updateEditTextPrefSummary(EditTextPreference preference) {
         preference.setSummary(preference.getText());
+    }
+
+    private void startScreensaver() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
 }
