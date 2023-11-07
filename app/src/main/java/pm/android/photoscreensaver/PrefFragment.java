@@ -25,7 +25,6 @@ public class PrefFragment
     private PreferenceCategory serverSettings;
     private EditTextPreference serverHost;
     private EditTextPreference serverPort;
-    private Preference startNow;
 
     private SharedPreferences prefs;
     private PhotoServiceDiscovery serviceDiscovery;
@@ -45,18 +44,9 @@ public class PrefFragment
         serverSettings = (PreferenceCategory)findPreference(R.string.pref_key_server_settings);
         serverHost = (EditTextPreference)findPreference(R.string.pref_key_server_host);
         serverPort = (EditTextPreference)findPreference(R.string.pref_key_server_port);
-        startNow = findPreference(R.string.pref_key_start);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         serviceDiscovery = new PhotoServiceDiscovery(getPreferenceScreen().getContext(), this);
-
-        startNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                startScreensaver();
-                return true;
-            }
-        });
     }
 
     @Override
@@ -96,6 +86,7 @@ public class PrefFragment
             public boolean onPreferenceClick(Preference preference) {
                 serverHost.setText(host.getHostAddress());
                 serverPort.setText(Integer.toString(port));
+                startScreensaver();
                 return true;
             }
         });

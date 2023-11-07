@@ -31,9 +31,4 @@
         </EditTextPreference>
     </PreferenceCategory>
 
-    <Preference
-        android:key="@string/pref_key_start"
-        android:title="@string/pref_title_start">
-    </Preference>
-
 </PreferenceScreen>
