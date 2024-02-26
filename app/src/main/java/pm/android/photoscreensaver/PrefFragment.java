@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.leanback.preference.LeanbackPreferenceFragment;
+import androidx.leanback.preference.LeanbackPreferenceFragmentCompat;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -15,10 +15,8 @@ import androidx.preference.SwitchPreference;
 import java.net.InetAddress;
 
 public class PrefFragment
-        extends LeanbackPreferenceFragment
+        extends LeanbackPreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener, PhotoServiceDiscovery.Callback {
-
-    private static final String TAG = PrefFragment.class.getName();
 
     private SwitchPreference autoDiscover;
     private PreferenceCategory availableServers;

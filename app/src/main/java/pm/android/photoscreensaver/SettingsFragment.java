@@ -2,30 +2,30 @@ package pm.android.photoscreensaver;
 
 import android.os.Bundle;
 
-import androidx.leanback.preference.LeanbackSettingsFragment;
+import androidx.leanback.preference.LeanbackSettingsFragmentCompat;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-public class SettingsFragment extends LeanbackSettingsFragment {
+public class SettingsFragment extends LeanbackSettingsFragmentCompat {
     @Override
     public void onPreferenceStartInitialScreen() {
         startPreferenceFragment(buildPreferenceFragment(R.xml.prefs, null));
     }
 
     @Override
-    public boolean onPreferenceStartFragment(PreferenceFragment caller, Preference pref) {
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, Preference pref) {
         return false;
     }
 
     @Override
-    public boolean onPreferenceStartScreen(PreferenceFragment caller, PreferenceScreen pref) {
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
         startPreferenceFragment(buildPreferenceFragment(R.xml.prefs, pref.getKey()));
         return true;
     }
 
-    private PreferenceFragment buildPreferenceFragment(int preferenceResId, String root) {
-        PreferenceFragment fragment = new PrefFragment();
+    private PreferenceFragmentCompat buildPreferenceFragment(int preferenceResId, String root) {
+        PreferenceFragmentCompat fragment = new PrefFragment();
         Bundle args = new Bundle();
         args.putInt("preferenceResource", preferenceResId);
         args.putString("root", root);
