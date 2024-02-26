@@ -6,7 +6,6 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -18,11 +17,8 @@ public class VolleyHelper {
 
     private final RequestQueue requestQueue;
 
-    private final Response.ErrorListener defaultErrorHandler = new Response.ErrorListener() {
-        public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "request failed: " + error);
-        }
-    };
+    private final Response.ErrorListener defaultErrorHandler =
+            (error) -> Log.d(TAG, "request failed: " + error);
 
     public VolleyHelper(Context context) {
         this.requestQueue = Volley.newRequestQueue(context);

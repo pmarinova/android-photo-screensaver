@@ -81,14 +81,11 @@ public class PrefFragment
         serverPref.setTitle(serviceInstanceName);
         serverPref.setSummary(host + ":" + port);
 
-        serverPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                serverHost.setText(host.getHostAddress());
-                serverPort.setText(Integer.toString(port));
-                startScreensaver();
-                return true;
-            }
+        serverPref.setOnPreferenceClickListener((preference) -> {
+            serverHost.setText(host.getHostAddress());
+            serverPort.setText(Integer.toString(port));
+            startScreensaver();
+            return true;
         });
 
         availableServers.addPreference(serverPref);

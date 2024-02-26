@@ -10,7 +10,6 @@ import android.widget.ImageView;
 
 import androidx.preference.PreferenceManager;
 
-import com.android.volley.Response;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -140,11 +139,9 @@ public class PhotoScreensaverService extends DreamService {
 
     @Override
     public void onDreamingStarted() {
-        loadPhotosList(new Runnable() {
-            public void run() {
-                running = true;
-                switchPhoto();
-            }
+        loadPhotosList(() -> {
+            running = true;
+            switchPhoto();
         });
     }
 
@@ -154,12 +151,10 @@ public class PhotoScreensaverService extends DreamService {
     }
 
     private void loadPhotosList(final Runnable callback) {
-        volley.getJSONArray(getPhotosListUrl(), new Response.Listener<JSONArray>() {
-            public void onResponse(JSONArray response) {
-                photos = jsonArrayToList(response);
-                Log.d(TAG, "loaded photos: " + photos);
-                callback.run();
-            }
+        volley.getJSONArray(getPhotosListUrl(), (response) -> {
+            photos = jsonArrayToList(response);
+            Log.d(TAG, "loaded photos: " + photos);
+            callback.run();
         });
     }
 
@@ -192,9 +187,9 @@ public class PhotoScreensaverService extends DreamService {
                 .listener(errorListener)
                 .into(imageView);
 
-        mainThreadHandler.postDelayed(new Runnable() {
-            public void run() { switchPhoto(); }
-        }, TimeUnit.SECONDS.toMillis(SWITCH_INTERVAL));
+        mainThreadHandler.postDelayed(
+                this::switchPhoto,
+                TimeUnit.SECONDS.toMillis(SWITCH_INTERVAL));
     }
 
     private String getRandomPhotoUrl() {
