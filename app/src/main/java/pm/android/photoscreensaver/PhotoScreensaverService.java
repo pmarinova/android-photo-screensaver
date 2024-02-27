@@ -8,6 +8,7 @@ import android.service.dreams.DreamService;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
@@ -90,12 +91,21 @@ public class PhotoScreensaverService extends DreamService {
      */
     private final RequestListener<Drawable> errorListener = new RequestListener<Drawable>() {
         @Override
-        public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+        public boolean onLoadFailed(
+                GlideException e,
+                Object model,
+                @NonNull Target<Drawable> target,
+                boolean isFirstResource) {
             Log.e(TAG, "failed to load " + model, e);
             return false;
         }
         @Override
-        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+        public boolean onResourceReady(
+                @NonNull Drawable resource,
+                @NonNull Object model,
+                Target<Drawable> target,
+                @NonNull DataSource dataSource,
+                boolean isFirstResource) {
             return false;
         }
     };
