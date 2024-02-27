@@ -55,6 +55,7 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onServiceFound(NsdServiceInfo serviceInfo) {
         Log.d(TAG, "service found: " + serviceInfo.getServiceName());
         nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
