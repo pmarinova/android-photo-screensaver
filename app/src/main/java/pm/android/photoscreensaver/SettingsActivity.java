@@ -1,9 +1,10 @@
 package pm.android.photoscreensaver;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class SettingsActivity extends Activity {
+import androidx.fragment.app.FragmentActivity;
+
+public class SettingsActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
