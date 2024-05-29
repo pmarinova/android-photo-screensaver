@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class PhotoScreensaverService extends DreamService {
 
@@ -149,7 +150,8 @@ public class PhotoScreensaverService extends DreamService {
 
     @Override
     public void onDreamingStarted() {
-        loadPhotosList(() -> {
+        loadPhotosList((photos) -> {
+            this.photos = photos;
             running = true;
             switchPhoto();
         });
@@ -160,11 +162,11 @@ public class PhotoScreensaverService extends DreamService {
         running = false;
     }
 
-    private void loadPhotosList(final Runnable callback) {
+    private void loadPhotosList(final Consumer<List<String>> callback) {
         volley.getJSONArray(getPhotosListUrl(), (response) -> {
-            photos = jsonArrayToList(response);
+            List<String> photos = jsonArrayToList(response);
             Log.d(TAG, "loaded photos: " + photos);
-            callback.run();
+            callback.accept(photos);
         });
     }
 
