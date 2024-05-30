@@ -29,6 +29,11 @@
             android:title="@string/pref_title_server_port"
             android:inputType="numberDecimal">
         </EditTextPreference>
+        <EditTextPreference
+            android:key="@string/pref_key_server_mac_address"
+            android:title="@string/pref_title_server_mac_address"
+            android:inputType="text">
+        </EditTextPreference>
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -1,16 +1,18 @@
 package pm.android.photoscreensaver;
 
 import android.content.Context;
+import android.net.MacAddress;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
 
     public interface Callback {
-        void onServiceFound(String serviceInstanceName, InetAddress host, int port);
+        void onServiceFound(String serviceInstanceName, InetAddress host, int port, MacAddress mac);
         void onServiceLost(String serviceInstanceName);
     }
 
@@ -55,15 +57,19 @@ public class PhotoServiceDiscovery implements NsdManager.DiscoveryListener {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onServiceFound(NsdServiceInfo serviceInfo) {
         Log.d(TAG, "service found: " + serviceInfo.getServiceName());
         nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
             @Override
             public void onServiceResolved(NsdServiceInfo serviceInfo) {
                 Log.d(TAG, "service resolved: " + serviceInfo);
+
+                byte[] macValue = serviceInfo.getAttributes().get("MAC");
+                String macString = macValue != null ? new String(macValue, StandardCharsets.UTF_8) : null;
+                MacAddress macAddress = macString != null ? MacAddress.fromString(macString) : null;
+
                 callback.onServiceFound(serviceInfo.getServiceName(),
-                        serviceInfo.getHost(), serviceInfo.getPort());
+                        serviceInfo.getHost(), serviceInfo.getPort(), macAddress);
             }
             @Override
             public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {

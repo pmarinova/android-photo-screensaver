@@ -18,4 +18,7 @@
     <string name="pref_key_server_port">prefs_server_port</string>
     <string name="pref_title_server_port">Port</string>
 
+    <string name="pref_key_server_mac_address">prefs_server_mac_address</string>
+    <string name="pref_title_server_mac_address">MAC Address</string>
+
 </resources>

@@ -2,6 +2,7 @@ package pm.android.photoscreensaver;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.MacAddress;
 import android.os.Bundle;
 
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat;
@@ -23,6 +24,7 @@ public class PrefFragment
     private PreferenceCategory serverSettings;
     private EditTextPreference serverHost;
     private EditTextPreference serverPort;
+    private EditTextPreference serverMACAddress;
 
     private SharedPreferences prefs;
     private PhotoServiceDiscovery serviceDiscovery;
@@ -42,6 +44,7 @@ public class PrefFragment
         serverSettings = (PreferenceCategory)findPreference(R.string.pref_key_server_settings);
         serverHost = (EditTextPreference)findPreference(R.string.pref_key_server_host);
         serverPort = (EditTextPreference)findPreference(R.string.pref_key_server_port);
+        serverMACAddress = (EditTextPreference)findPreference(R.string.pref_key_server_mac_address);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         serviceDiscovery = new PhotoServiceDiscovery(getPreferenceScreen().getContext(), this);
@@ -73,7 +76,12 @@ public class PrefFragment
     }
 
     @Override
-    public void onServiceFound(String serviceInstanceName, final InetAddress host, final int port) {
+    public void onServiceFound(
+            String serviceInstanceName,
+            final InetAddress host,
+            final int port,
+            final MacAddress macAddress) {
+
         Preference serverPref = new Preference(this.getPreferenceScreen().getContext());
         serverPref.setKey(serviceInstanceName);
         serverPref.setTitle(serviceInstanceName);
@@ -82,6 +90,7 @@ public class PrefFragment
         serverPref.setOnPreferenceClickListener((preference) -> {
             serverHost.setText(host.getHostAddress());
             serverPort.setText(Integer.toString(port));
+            serverMACAddress.setText(macAddress.toString());
             startScreensaver();
             return true;
         });
@@ -98,9 +107,13 @@ public class PrefFragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference changedPreference = getPreferenceScreen().findPreference(key);
-        if (changedPreference.equals(serverHost) || changedPreference.equals(serverPort)) {
+
+        if (changedPreference instanceof EditTextPreference) {
             updateEditTextPrefSummary((EditTextPreference)changedPreference);
-        } else if (changedPreference.equals(autoDiscover)) {
+            return;
+        }
+
+        if (autoDiscover.equals(changedPreference)) {
             if (autoDiscover.isChecked()) {
                 serviceDiscovery.start();
             } else {
