@@ -1,11 +1,13 @@
 package pm.android.photoscreensaver;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.preference.PreferenceManager;
+import com.android.volley.NoConnectionError;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,23 +35,19 @@ public class PhotoServer implements PhotosProvider {
     private static final String PHOTOS_LIST_URL_PATH = PHOTOS_BASE_URL_PATH + "/list";
 
 
-    /**
-     * Volley is the library that handles the HTTP request to load the photos list.
-     * VolleyHelper is a tiny wrapper over Volley that simplifies the request.
-     */
-    private final VolleyHelper volley;
-
     private final String host;
     private final int port;
+
+    private final RequestQueue requestQueue;
 
     private List<Uri> photos = Collections.emptyList();
 
     private final Random random = new Random();
 
     public PhotoServer(Context context, String host, int port) {
-        this.volley = new VolleyHelper(context);
         this.host = host;
         this.port = port;
+        this.requestQueue = Volley.newRequestQueue(context);
     }
 
     @Override
@@ -69,11 +67,14 @@ public class PhotoServer implements PhotosProvider {
     }
 
     private void loadPhotosList(Consumer<List<String>> callback) {
-        volley.getJSONArray(getPhotosListUrl(), (response) -> {
-            List<String> photos = jsonArrayToList(response);
-            Log.d(TAG, "loaded photos: " + photos);
-            callback.accept(photos);
-        });
+        requestQueue.add(new JsonArrayRequest(getPhotosListUrl(),
+                (response) -> {
+                    List<String> photos = jsonArrayToList(response);
+                    Log.d(TAG, "loaded photos: " + photos);
+                    callback.accept(photos);
+                },
+                (error) -> Log.d(TAG, "request failed: " + error)
+        ));
     }
 
     private String getServerUrl() {
