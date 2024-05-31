@@ -6,6 +6,9 @@
     <string name="pref_key_discover_automatically">prefs_discover_automatically</string>
     <string name="pref_title_discover_automatically">Discover available servers</string>
 
+    <string name="pref_key_send_wake_on_lan">prefs_send_wake_on_lan</string>
+    <string name="pref_title_send_wake_on_lan">Wake-on-LAN</string>
+
     <string name="pref_key_available_servers">prefs_available_servers</string>
     <string name="pref_title_available_servers">Available servers</string>
 

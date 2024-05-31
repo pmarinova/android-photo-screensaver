@@ -10,6 +10,12 @@
         android:disableDependentsState="true">
     </SwitchPreference>
 
+    <SwitchPreference
+        android:key="@string/pref_key_send_wake_on_lan"
+        android:title="@string/pref_title_send_wake_on_lan"
+        android:defaultValue="false">
+    </SwitchPreference>
+
     <PreferenceCategory
         android:key="@string/pref_key_available_servers"
         android:title="@string/pref_title_available_servers">
