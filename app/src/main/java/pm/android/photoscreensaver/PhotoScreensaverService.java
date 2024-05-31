@@ -1,7 +1,7 @@
 package pm.android.photoscreensaver;
 
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.MacAddress;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -94,14 +93,15 @@ public class PhotoScreensaverService extends DreamService {
 
         setContentView(R.layout.photo_screensaver);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String host = prefs.getString(getString(R.string.pref_key_server_host), null);
-        int port = Integer.valueOf(prefs.getString(getString(R.string.pref_key_server_port), null));
+        Prefs prefs = new Prefs(this);
+        String host = prefs.getServerHost();
+        int port = prefs.getServerPort();
+        MacAddress mac = prefs.getServerMACAddress();
+        boolean wakeOnLan = prefs.isWakeOnLanEnabled();
+        PhotoServer photoServer = new PhotoServer(this, host, port, mac, wakeOnLan);
+        Log.d(TAG, "photo server: " + photoServer);
 
-        Log.d(TAG, "host: " + host);
-        Log.d(TAG, "port: " + port);
-
-        photosProvider = new PhotoServer(this, host, port);
+        photosProvider = photoServer;
         imageView = findViewById(R.id.imageView);
         mainThreadHandler = new Handler(Looper.getMainLooper());
     }

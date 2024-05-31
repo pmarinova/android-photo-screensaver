@@ -1,8 +1,11 @@
 package pm.android.photoscreensaver;
 
 import android.content.Context;
+import android.net.MacAddress;
 import android.net.Uri;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
@@ -37,6 +40,8 @@ public class PhotoServer implements PhotosProvider {
 
     private final String host;
     private final int port;
+    private final MacAddress mac;
+    private final boolean wakeOnLan;
 
     private final RequestQueue requestQueue;
 
@@ -44,9 +49,11 @@ public class PhotoServer implements PhotosProvider {
 
     private final Random random = new Random();
 
-    public PhotoServer(Context context, String host, int port) {
+    public PhotoServer(Context context, String host, int port, MacAddress mac, boolean wakeOnLan) {
         this.host = host;
         this.port = port;
+        this.mac = mac;
+        this.wakeOnLan = wakeOnLan;
         this.requestQueue = Volley.newRequestQueue(context);
     }
 
@@ -73,7 +80,14 @@ public class PhotoServer implements PhotosProvider {
                     Log.d(TAG, "loaded photos: " + photos);
                     callback.accept(photos);
                 },
-                (error) -> Log.d(TAG, "request failed: " + error)
+                (error) -> {
+                    if (error instanceof NoConnectionError && wakeOnLan && mac != null) {
+                        Log.d(TAG, "server not available, wake-on-lan and retry...");
+                        //TODO: wake-on-lan and retry...
+                    } else {
+                        Log.d(TAG, "request failed: " + error);
+                    }
+                }
         ));
     }
 
@@ -89,6 +103,12 @@ public class PhotoServer implements PhotosProvider {
     private String getPhotoUrl(String photo) {
         String serverUrl = getServerUrl();
         return serverUrl + PHOTOS_BASE_URL_PATH + "/" + photo;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return getServerUrl();
     }
 
     private static List<String> jsonArrayToList(JSONArray jsonArray) {
