@@ -3,6 +3,7 @@ package pm.android.photoscreensaver;
 import android.content.Context;
 import android.net.MacAddress;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,8 @@ public class PhotoServer implements PhotosProvider {
     private final MacAddress mac;
     private final boolean wakeOnLan;
 
+    private final Handler mainThreadHandler;
+    private final Executor executorService;
     private final RequestQueue requestQueue;
 
     private List<Uri> photos = Collections.emptyList();
@@ -54,6 +58,8 @@ public class PhotoServer implements PhotosProvider {
         this.port = port;
         this.mac = mac;
         this.wakeOnLan = wakeOnLan;
+        this.mainThreadHandler = ((App)context.getApplicationContext()).getMainThreadHandler();
+        this.executorService = ((App)context.getApplicationContext()).getExecutorService();
         this.requestQueue = Volley.newRequestQueue(context);
     }
 
@@ -65,7 +71,7 @@ public class PhotoServer implements PhotosProvider {
                     .map(Uri::parse)
                     .collect(Collectors.toList());
             callback.run();
-        });
+        }, 3);
     }
 
     @Override
@@ -73,7 +79,7 @@ public class PhotoServer implements PhotosProvider {
         return photos.get(random.nextInt(photos.size()));
     }
 
-    private void loadPhotosList(Consumer<List<String>> callback) {
+    private void loadPhotosList(Consumer<List<String>> callback, int retryCount) {
         requestQueue.add(new JsonArrayRequest(getPhotosListUrl(),
                 (response) -> {
                     List<String> photos = jsonArrayToList(response);
@@ -81,14 +87,21 @@ public class PhotoServer implements PhotosProvider {
                     callback.accept(photos);
                 },
                 (error) -> {
-                    if (error instanceof NoConnectionError && wakeOnLan && mac != null) {
-                        Log.d(TAG, "server not available, wake-on-lan and retry...");
-                        //TODO: wake-on-lan and retry...
+                    if (wakeOnLan && mac != null && retryCount > 0) {
+                        Log.d(TAG, "server not available, send wake-on-lan packet and retry...");
+                        sendWakeOnLan(mac, () -> loadPhotosList(callback, retryCount-1));
                     } else {
                         Log.d(TAG, "request failed: " + error);
                     }
                 }
         ));
+    }
+
+    private void sendWakeOnLan(MacAddress macAddress, Runnable callback) {
+        executorService.execute(() -> {
+            WakeOnLan.sendWolPacket(macAddress);
+            mainThreadHandler.postDelayed(callback, 500);
+        });
     }
 
     private String getServerUrl() {
