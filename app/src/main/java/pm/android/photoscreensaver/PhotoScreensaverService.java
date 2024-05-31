@@ -103,7 +103,7 @@ public class PhotoScreensaverService extends DreamService {
 
         photosProvider = photoServer;
         imageView = findViewById(R.id.imageView);
-        mainThreadHandler = new Handler(Looper.getMainLooper());
+        mainThreadHandler = ((App)getApplication()).getMainThreadHandler();
     }
 
     @Override
