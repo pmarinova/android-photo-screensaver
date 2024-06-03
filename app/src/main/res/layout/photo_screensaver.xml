@@ -4,14 +4,22 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/imageView" />
+        android:layout_height="match_parent" />
 
-    <TextClock
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <include layout="@layout/error" />
+
+    <TextClock
         android:id="@+id/textClock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:alpha=".68"
         android:layout_gravity="end|bottom"

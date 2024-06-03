@@ -8,7 +8,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
@@ -64,14 +63,14 @@ public class PhotoServer implements PhotosProvider {
     }
 
     @Override
-    public void init(Runnable callback) {
+    public void init(Runnable onSuccess, Consumer<Exception> onError) {
         loadPhotosList((photos) -> {
             this.photos = photos.stream()
                     .map(this::getPhotoUrl)
                     .map(Uri::parse)
                     .collect(Collectors.toList());
-            callback.run();
-        }, 3);
+            onSuccess.run();
+        }, onError, 3);
     }
 
     @Override
@@ -79,19 +78,20 @@ public class PhotoServer implements PhotosProvider {
         return photos.get(random.nextInt(photos.size()));
     }
 
-    private void loadPhotosList(Consumer<List<String>> callback, int retryCount) {
+    private void loadPhotosList(Consumer<List<String>> onSuccess, Consumer<Exception> onError, int retryCount) {
         requestQueue.add(new JsonArrayRequest(getPhotosListUrl(),
                 (response) -> {
                     List<String> photos = jsonArrayToList(response);
                     Log.d(TAG, "loaded photos: " + photos);
-                    callback.accept(photos);
+                    onSuccess.accept(photos);
                 },
                 (error) -> {
                     if (wakeOnLan && mac != null && retryCount > 0) {
                         Log.d(TAG, "server not available, send wake-on-lan packet and retry...");
-                        sendWakeOnLan(mac, () -> loadPhotosList(callback, retryCount-1));
+                        sendWakeOnLan(mac, () -> loadPhotosList(onSuccess, onError, retryCount-1));
                     } else {
                         Log.d(TAG, "request failed: " + error);
+                        onError.accept(error);
                     }
                 }
         ));

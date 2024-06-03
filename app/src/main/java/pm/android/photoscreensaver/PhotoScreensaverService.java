@@ -4,10 +4,12 @@ import android.graphics.drawable.Drawable;
 import android.net.MacAddress;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.Looper;
 import android.service.dreams.DreamService;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -45,6 +47,21 @@ public class PhotoScreensaverService extends DreamService {
      * The image view which displays the current photo on the screen.
      */
     private ImageView imageView;
+
+    /**
+     * Loading indicator which is displayed while the list of photos is loaded.
+     */
+    private ProgressBar loadingIndicator;
+
+    /**
+     * Error view which is displayed when the listing of photos fails.
+     */
+    private View errorView;
+
+    /**
+     * The error text message.
+     */
+    private TextView errorText;
 
     /**
      * URL of the photo currently loaded into the imageView.
@@ -103,14 +120,24 @@ public class PhotoScreensaverService extends DreamService {
 
         photosProvider = photoServer;
         imageView = findViewById(R.id.imageView);
+        loadingIndicator = findViewById(R.id.loadingIndicator);
+        errorView = findViewById(R.id.errorView);
+        errorText = errorView.findViewById(R.id.errorMessage);
         mainThreadHandler = ((App)getApplication()).getMainThreadHandler();
     }
 
     @Override
     public void onDreamingStarted() {
+        hideErrorView();
+        showLoadingIndicator();
+
         photosProvider.init(() -> {
+            hideLoadingIndicator();
             running = true;
             switchPhoto();
+        }, (error) -> {
+            hideLoadingIndicator();
+            showErrorView(error);
         });
     }
 
@@ -149,5 +176,25 @@ public class PhotoScreensaverService extends DreamService {
         mainThreadHandler.postDelayed(
                 this::switchPhoto,
                 TimeUnit.SECONDS.toMillis(SWITCH_INTERVAL));
+    }
+
+    private void hideLoadingIndicator() {
+        loadingIndicator.setVisibility(View.GONE);
+    }
+
+    private void showLoadingIndicator() {
+        loadingIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideErrorView() {
+        errorView.setVisibility(View.GONE);
+        errorText.setText("");
+    }
+
+    private void showErrorView(Throwable error) {
+        String errorMessage = (error.getMessage() != null && !error.getMessage().isEmpty()) ?
+                error.getMessage() : error.toString();
+        errorView.setVisibility(View.VISIBLE);
+        errorText.setText(errorMessage);
     }
 }

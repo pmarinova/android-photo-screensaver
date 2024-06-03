@@ -24,4 +24,6 @@
     <string name="pref_key_server_mac_address">prefs_server_mac_address</string>
     <string name="pref_title_server_mac_address">MAC Address</string>
 
+    <string name="error_title">Oops! There was an error :(</string>
+
 </resources>
